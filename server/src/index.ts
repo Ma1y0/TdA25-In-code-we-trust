@@ -11,8 +11,8 @@ app.use(logger());
 app.route("/api", api);
 
 // The static page
-app.use("/*", serveStatic({ root: "./client" }));
 app.get("/", serveStatic({ path: "./client/index.html" }));
+app.use("/*", serveStatic({ root: "./client" }));
 
 export default {
   port: process.env.PORT ?? 80,

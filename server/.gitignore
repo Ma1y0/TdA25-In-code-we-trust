@@ -3,4 +3,4 @@ node_modules/
 
 client/
 
-db.sqlite3
+db.sqlite

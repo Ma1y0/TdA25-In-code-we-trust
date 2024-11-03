@@ -1,3 +1,4 @@
+import { Board } from "@/db/schema";
 import { z } from "zod";
 
 // Difficulty Schema
@@ -12,7 +13,8 @@ export const DifficultySchema = z.enum([
 // Board State Schema (15x15 matrix)
 export const BoardSchema = z
   .array(z.array(z.enum(["X", "O", ""])).length(15))
-  .length(15);
+  .length(15)
+  .transform((board) => board as Board);
 
 // Game Create/Update Request Schema
 export const GameUpdateSchema = z.object({

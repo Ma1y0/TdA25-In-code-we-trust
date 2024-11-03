@@ -16,13 +16,16 @@ api.post("/game", zValidator("json", GameUpdateSchema), async (c) => {
   const body = c.req.valid("json");
 
   // Maybe handle the error?????
-  await db.insert(games).values({
-    id: crypto.randomUUID(),
-    name: body.name,
-    difficulty: body.difficulty,
-    board: body.board,
-    gameState: "unknown",
-  });
+  const game = await db
+    .insert(games)
+    .values({
+      uuid: crypto.randomUUID(),
+      name: body.name,
+      difficulty: body.difficulty,
+      board: body.board,
+      gameState: "unknown",
+    })
+    .returning();
 
-  return c.json({ message: "Hello" });
+  return c.json(game);
 });

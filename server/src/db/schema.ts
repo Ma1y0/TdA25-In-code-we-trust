@@ -12,7 +12,7 @@ export type Board = [Row, ...Row[]] & { length: 15 };
 export const games = sqliteTable(
   "games",
   {
-    id: text("id").primaryKey(),
+    uuid: text("uuid").primaryKey(),
     name: text("name").notNull(),
     difficulty: text("difficulty", { enum: difficulty }).notNull(),
     gameState: text("game_state", { enum: gameState }).notNull(),

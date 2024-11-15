@@ -12,7 +12,7 @@ api.get("/", (e) => {
 });
 
 // Create game
-api.post("/game", zValidator("json", GameUpdateSchema), async (c) => {
+api.post("/games", zValidator("json", GameUpdateSchema), async (c) => {
   const body = c.req.valid("json");
 
   // Maybe handle the error?????

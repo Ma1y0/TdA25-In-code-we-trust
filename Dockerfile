@@ -44,4 +44,4 @@ RUN bun install --production
 
 EXPOSE 80
 
-CMD ["bun", "run", "dev"]
+CMD ["bun", "run", "./src/index.ts"]

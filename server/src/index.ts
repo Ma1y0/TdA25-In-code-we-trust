@@ -8,7 +8,7 @@ const app = new Hono();
 app.use(logger());
 
 // The API routes
-app.route("/api", api);
+app.route("/api/v1/", api);
 
 // The static page
 app.get("/", serveStatic({ path: "./client/index.html" }));

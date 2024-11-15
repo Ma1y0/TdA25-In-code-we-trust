@@ -27,5 +27,5 @@ api.post("/games", zValidator("json", GameUpdateSchema), async (c) => {
     })
     .returning();
 
-  return c.json(game, 201);
+  return c.json(game[0], 201);
 });

@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "migrate": "bunx drizzle-kit generate && bunx drizzle-kit migrate",
+    "generate": "bunx drizzle-kit generate",
     "studio": "bunx drizzle-kit studio"
   },
   "dependencies": {

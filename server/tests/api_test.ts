@@ -54,6 +54,7 @@ describe("/api", () => {
 //     });
 //
 //     // Tests
+//     expect(record).not.toBeUndefined();
 //     expect(res.status).toBe(201);
 //     expect(json).toEqual(record);
 //   });

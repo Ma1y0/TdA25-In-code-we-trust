@@ -1,4 +1,5 @@
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { Database } from "bun:sqlite";
 import * as schema from "./schema";
 
@@ -16,3 +17,6 @@ export async function resetDB() {
 }
 
 export const db = drizzle(createDB(), { schema });
+
+// Auto migration
+migrate(db, { migrationsFolder: "./drizzle" });

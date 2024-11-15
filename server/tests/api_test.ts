@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll, beforeEach } from "bun:test";
 import app from "@/.";
-import { db, resetDB } from "@/db";
-import { eq } from "drizzle-orm";
-import { games } from "@/db/schema";
+import { resetDB } from "@/db";
+// import { db, resetDB } from "@/db";
+// import { eq } from "drizzle-orm";
+// import { games } from "@/db/schema";
 
 beforeAll(() => {
   // Sets up the environment for testing

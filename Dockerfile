@@ -19,6 +19,8 @@ COPY client /app/client
 
 # Run server tests
 WORKDIR /app/server
+RUN ls -al
+RUN ls client
 RUN bun test
 
 # Build the front-end
@@ -33,6 +35,7 @@ WORKDIR /app
 COPY --from=build /app/client/dist ./client
 COPY --from=build /app/server/package.json /app/server/bun.lockb /app/server/tsconfig.json ./
 COPY --from=build /app/server/src ./src
+COPY --from=build /app/server/drizzle ./drizzle
 
 ENV NODE_ENV=production
 ENV DB="db.sqlite"

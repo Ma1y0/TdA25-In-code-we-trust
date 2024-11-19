@@ -18,8 +18,8 @@ COPY server /app/server
 COPY client /app/client
 
 # Run server tests
-# WORKDIR /app/server
-# RUN bun test :(
+WORKDIR /app/server
+RUN bun test
 
 # Build the front-end
 WORKDIR /app/client

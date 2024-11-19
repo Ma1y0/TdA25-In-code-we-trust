@@ -3,6 +3,7 @@ import { db, resetDB } from "@/db";
 import { Board, games } from "@/db/schema";
 import { beforeAll, beforeEach, describe, expect, it } from "bun:test";
 
+
 beforeAll(() => {
   // Sets up the environment for testing
   process.env.NODE_ENV = "test";

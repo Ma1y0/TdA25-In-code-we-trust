@@ -6,7 +6,7 @@ import * as schema from "./schema";
 // Creates DB "connection" based on the environment
 function createDB() {
   if (process.env.NODE_ENV === "test") {
-    console.log("Creted in :memory: db");
+    console.log("Created in :memory: db");
     return new Database(":memory:");
   } else {
     return new Database(process.env.DB!);

@@ -1,5 +1,36 @@
 import { Board } from "@/db/schema";
+import { Context } from "hono";
 import { z } from "zod";
+
+// TODO: figure out the type for any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function handleShcemaError(result: any, c: Context) {
+  // Extracts all board schema cussed errors
+  const boardErrors = result.error.errors.filter(
+    (err: any) => err.path.includes("board") || err.path[0] === "board",
+  );
+
+  // Returns different error for board related issues
+  if (boardErrors.length > 0) {
+    return c.json(
+      {
+        code: 422,
+        message: `Semantic error: ${boardErrors.map((err: { message: string }) => err.message).join(", ")}`,
+      },
+      422,
+    );
+  }
+
+  if (!result.success) {
+    return c.json(
+      {
+        code: 400,
+        message: `Bad request: ${result.error}`,
+      },
+      400,
+    );
+  }
+}
 
 // Difficulty Schema
 export const DifficultySchema = z.enum([

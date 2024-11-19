@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { GameUpdateSchema, handleShcemaError } from "./schema";
+import { GameUpdateSchema, handleSchemaError } from "./schema";
 import { db } from "@/db";
 import { games } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -20,7 +20,7 @@ api.get("/games", async (c) => {
 // Create game record
 api.post(
   "/games",
-  zValidator("json", GameUpdateSchema, handleShcemaError),
+  zValidator("json", GameUpdateSchema, handleSchemaError),
   async (c) => {
     const body = c.req.valid("json");
 
@@ -59,7 +59,7 @@ api.get("/games/:uuid", async (c) => {
 // Updates a game record
 api.put(
   "/games/:uuid",
-  zValidator("json", GameUpdateSchema, handleShcemaError),
+  zValidator("json", GameUpdateSchema, handleSchemaError),
   async (c) => {
     const { uuid } = c.req.param();
     const body = c.req.valid("json");
@@ -67,7 +67,12 @@ api.put(
     // Handle this error
     const newGame = await db
       .update(games)
-      .set(body)
+      .set({
+        name: body.name,
+        difficulty: body.difficulty,
+        board: body.board,
+        gameState: body.gameState,
+      })
       .where(eq(games.uuid, uuid))
       .returning();
 
@@ -107,23 +112,4 @@ api.delete("/games/:uuid", async (c) => {
   }
 
   return c.text("", 204);
-});
-
-// Create game
-api.post("/games", zValidator("json", GameUpdateSchema), async (c) => {
-  const body = c.req.valid("json");
-
-  // Maybe handle the error?????
-  const game = await db
-    .insert(games)
-    .values({
-      uuid: crypto.randomUUID(),
-      name: body.name,
-      difficulty: body.difficulty,
-      board: body.board,
-      gameState: "unknown",
-    })
-    .returning();
-
-  return c.json(game[0], 201);
 });

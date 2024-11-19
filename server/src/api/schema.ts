@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // TODO: figure out the type for any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function handleShcemaError(result: any, c: Context) {
+export function handleSchemaError(result: any, c: Context) {
   if (!result.success) {
     // Extracts all board schema cussed errors
     const boardErrors = result.error.errors.filter(
@@ -41,6 +41,14 @@ export const DifficultySchema = z.enum([
   "extreme",
 ]);
 
+// Game State Enum
+export const GameStateEnum = z.enum([
+  "opening",
+  "midgame",
+  "endgame",
+  "unknown",
+]);
+
 // Board State Schema (15x15 matrix)
 export const BoardSchema = z
   .array(z.array(z.enum(["X", "O", ""])).length(15))
@@ -50,17 +58,10 @@ export const BoardSchema = z
 // Game Create/Update Request Schema
 export const GameUpdateSchema = z.object({
   name: z.string().min(1),
+  gameState: GameStateEnum.default("unknown"),
   difficulty: DifficultySchema,
   board: BoardSchema.default(Array(15).fill(Array(15).fill(""))),
 });
-
-// Game State Enum
-export const GameStateEnum = z.enum([
-  "opening",
-  "midgame",
-  "endgame",
-  "unknown",
-]);
 
 // Game Response Schema
 export const GameSchema = z.object({

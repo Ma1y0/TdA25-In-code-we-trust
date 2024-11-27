@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { GameUpdateSchema, handleSchemaError } from "./schema";
 import { db } from "@/db";
 import { games } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 // /api routes
 export const api = new Hono();
@@ -71,7 +71,8 @@ api.put(
         name: body.name,
         difficulty: body.difficulty,
         board: body.board,
-        gameState: body.gameState,
+        gameState: "unknown",
+        turns: sql`${games.turns} + 1`,
       })
       .where(eq(games.uuid, uuid))
       .returning();

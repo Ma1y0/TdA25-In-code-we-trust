@@ -1,7 +1,6 @@
 CREATE TABLE `games` (
 	`uuid` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
-	`turns` integer DEFAULT 0 NOT NULL,
 	`difficulty` text NOT NULL,
 	`game_state` text NOT NULL,
 	`board` text NOT NULL,

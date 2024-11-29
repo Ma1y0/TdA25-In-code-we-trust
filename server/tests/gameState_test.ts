@@ -1,4 +1,4 @@
-import { type Game, type Board } from "@/db/schema";
+import { type Cell, type Board } from "@/db/schema";
 import { detectEndgame } from "@/board";
 import { beforeAll, describe, expect, it } from "bun:test";
 import { detectGameState } from "@/gameState";
@@ -13,26 +13,32 @@ function createEmptyBoard(): Board {
     .map(() => Array(15).fill("")) as Board;
 }
 
-function createMockGame(turns: number = 0): Game {
-  return {
-    uuid: crypto.randomUUID(),
-    name: "name",
-    turns: turns,
-    difficulty: "beginner",
-    gameState: "unknown",
-    board: createEmptyBoard(),
-    createdAt: "",
-    updatedAt: "",
-  };
-}
+export function createMockGame(turns: number): Board {
+  const board = createEmptyBoard();
+  const players: Cell[] = ["X", "O"];
 
-const width = 15;
-const height = 15;
+  for (let i = 0; i < turns; i++) {
+    let placed = false;
+
+    while (!placed) {
+      const row = Math.floor(Math.random() * 15);
+      const col = Math.floor(Math.random() * 15);
+
+      if (board[row][col] === "") {
+        const player = players[i % 2]; // Alternate between "X" and "O"
+        board[row][col] = player;
+        placed = true;
+      }
+    }
+  }
+
+  return board;
+}
 
 describe("detectGameState", () => {
   it("Should return beginning when game.turns <= 5", () => {
-    const game = createMockGame(3);
-    const state = detectGameState(game);
+    const board = createMockGame(3);
+    const state = detectGameState(board);
 
     expect(state).toBe("opening");
   });
@@ -45,17 +51,20 @@ describe("detectGameState", () => {
   });
 
   it("Should detect endgame", () => {
-    const game = createMockGame(1);
-    game.board[0][0] = "X";
-    game.board[1][1] = "X";
-    game.board[2][2] = "X";
-    game.board[3][3] = "X";
+    const board = createMockGame(1);
+    board[0][0] = "X";
+    board[1][1] = "X";
+    board[2][2] = "X";
+    board[3][3] = "X";
 
-    const state = detectGameState(game);
+    const state = detectGameState(board);
 
     expect(state).toBe("endgame");
   });
 });
+
+const width = 15;
+const height = 15;
 
 describe("detectEndgame", () => {
   // Helper function to create a board

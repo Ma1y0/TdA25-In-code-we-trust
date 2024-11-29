@@ -1,11 +1,17 @@
-import { Game, GameState } from "@/db/schema";
+import { type Board, type GameState } from "@/db/schema";
 import { detectEndgame } from "./board";
 
-export function detectGameState(game: Game): GameState {
-  if (detectEndgame(game.board)) return "endgame";
-  if (game.turns <= 5) {
+function calculateTurns(board: Board): number {
+  return board.flat().filter((x) => x !== "").length;
+}
+
+export function detectGameState(board: Board): GameState {
+  if (detectEndgame(board)) return "endgame";
+  const turns = calculateTurns(board);
+
+  if (turns <= 5) {
     return "opening";
-  } else if (game.turns >= 6) {
+  } else if (turns >= 6) {
     return "midgame";
   } else {
     return "unknown";

@@ -60,7 +60,7 @@ describe("detectEndgame", () => {
     expect(detectEndgame(board)).toBeTrue();
   });
 
-  it("Should detect diagonal win from top-right to bottom-left", () => {
+  it("Should be true on diagonal from top-right to bottom-left", () => {
     const board = createEmptyBoard();
     board[0][4] = "X";
     board[1][3] = "X";
@@ -70,7 +70,7 @@ describe("detectEndgame", () => {
     expect(detectEndgame(board)).toBeTrue();
   });
 
-  it("Should detect win with empty cell before or after the winning sequence", () => {
+  it("Should be true with a gap", () => {
     const board = createEmptyBoard();
     board[0][0] = "X";
     board[0][1] = "X";
@@ -81,7 +81,7 @@ describe("detectEndgame", () => {
     expect(detectEndgame(board)).toBeTrue();
   });
 
-  it("Should not detect false positive for non-winning sequences", () => {
+  it("Should be false for non-winning sequences", () => {
     const board = createEmptyBoard();
     board[0][0] = "X";
     board[0][1] = "X";
@@ -90,7 +90,7 @@ describe("detectEndgame", () => {
     expect(detectEndgame(board)).toBeFalse();
   });
 
-  it("Should handle multiple players", () => {
+  it("Should be true with multiple players", () => {
     const board = createEmptyBoard();
     board[0][0] = "X";
     board[0][1] = "X";
@@ -107,7 +107,7 @@ describe("detectEndgame", () => {
     expect(detectEndgame(oBoard)).toBeTrue();
   });
 
-  it("Should work with edge cases near board boundaries", () => {
+  it("Should be true in special case near board boundaries", () => {
     const board = createEmptyBoard();
     board[14][0] = "X";
     board[13][1] = "X";

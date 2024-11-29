@@ -21,7 +21,7 @@ export function detectEndgame(board: Board): boolean {
     }
 
     // Check diagonals (top-left to bottom-right)
-    // Start from leftmost column
+    // Start from left column
     for (let col = 0; col < board[0].length; col++) {
       const diagonal = getDiagonalTLBR(board, 0, col);
       if (diagonal.length >= 5 && canCompleteLine(diagonal, player))
@@ -35,7 +35,7 @@ export function detectEndgame(board: Board): boolean {
     }
 
     // Check diagonals (top-right to bottom-left)
-    // Start from rightmost column
+    // Start from right column
     for (let col = board[0].length - 1; col >= 0; col--) {
       const diagonal = getDiagonalTRBL(board, 0, col);
       if (diagonal.length >= 5 && canCompleteLine(diagonal, player))

@@ -8,6 +8,8 @@ export type Cell = "X" | "O" | "";
 export type Row = [Cell, ...Cell[]] & { length: 15 };
 export type Board = [Row, ...Row[]] & { length: 15 };
 
+export type GameState = (typeof gameState)[number];
+
 export const games = sqliteTable(
   "games",
   {
@@ -33,3 +35,5 @@ export const games = sqliteTable(
     nameIdx: index("idx_games_name").on(table.name),
   }),
 );
+
+export type Game = typeof games.$inferSelect;

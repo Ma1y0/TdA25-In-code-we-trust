@@ -4,8 +4,6 @@ const winLen = 5;
 const players = ["X", "O"] as const;
 
 export function detectEndgame(board: Board): boolean {
-  // How many cells does player need to win
-
   for (const player of players) {
     // The lines
     for (const row of board) {

@@ -33,7 +33,7 @@ api.post(
         name: body.name,
         difficulty: body.difficulty,
         board: body.board,
-        gameState: "unknown",
+        gameState: detectGameState(body.board),
       })
       .returning();
 

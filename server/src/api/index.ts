@@ -4,7 +4,7 @@ import { GameUpdateSchema, handleSchemaError } from "./schema";
 import { db } from "@/db";
 import { games } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { detectGameState } from "@/gameState";
+import { detectGameState } from "@/boardHelpers";
 
 // /api routes
 export const api = new Hono();
@@ -12,7 +12,7 @@ export const api = new Hono();
 // Get all game records
 api.get("/games", async (c) => {
   // Handle this error
-  // I think a limit should be here, but they ask for all of the games.
+  // I think a limit should be here, but they're asking for all games.
   const allGames = await db.select().from(games);
 
   return c.json(allGames);

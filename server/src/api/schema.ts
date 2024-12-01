@@ -1,9 +1,11 @@
+import { whoStarted } from "@/boardHelpers";
 import { Board } from "@/db/schema";
 import { Context } from "hono";
 import { z } from "zod";
 
 // TODO: figure out the type for any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function handleSchemaError(result: any, c: Context) {
   if (!result.success) {
     // Extracts all board schema cussed errors
@@ -53,6 +55,13 @@ export const GameStateEnum = z.enum([
 export const BoardSchema = z
   .array(z.array(z.enum(["X", "O", ""])).length(15))
   .length(15)
+  .refine(
+    (board) => {
+      const started = whoStarted(board as Board);
+      return started !== "O";
+    },
+    { message: "Invalid board: X must start" },
+  )
   .transform((board) => board as Board);
 
 // Game Create/Update Request Schema
@@ -70,6 +79,6 @@ export const GameSchema = z.object({
   updatedAt: z.string().datetime(),
   name: z.string().min(1),
   difficulty: DifficultySchema,
-  gameState: GameStateEnum,
+  gameState: GameStateEnum.default("unknown"),
   board: BoardSchema,
 });

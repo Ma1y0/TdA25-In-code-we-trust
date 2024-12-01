@@ -1,7 +1,7 @@
 import { type Cell, type Board } from "@/db/schema";
-import { detectEndgame } from "@/board";
+import { detectEndgame } from "@/endgameHelpers";
 import { beforeAll, describe, expect, it } from "bun:test";
-import { detectGameState } from "@/gameState";
+import { detectGameState, whoStarted } from "@/boardHelpers";
 
 beforeAll(() => {
   process.env.NODE_ENV = "test";
@@ -32,7 +32,8 @@ export function createMockGame(turns: number): Board {
     }
   }
 
-  return board;
+  // In case an endgame board is generated
+  return detectEndgame(board) ? createMockGame(turns) : board;
 }
 
 describe("detectGameState", () => {
@@ -167,5 +168,38 @@ describe("detectEndgame", () => {
     board[10][4] = "X";
 
     expect(detectEndgame(board)).toBeTrue();
+  });
+});
+
+describe("Who started", () => {
+  it("Should detect X started", () => {
+    const board = createEmptyBoard();
+
+    board[0][0] = "X";
+
+    expect(whoStarted(board)).toBe("X");
+  });
+
+  it("Should detect O started", () => {
+    const board = createEmptyBoard();
+
+    board[0][0] = "O";
+
+    expect(whoStarted(board)).toBe("O");
+  });
+
+  it("Should detect invalid board", () => {
+    const board = createEmptyBoard();
+
+    board[0][0] = "X";
+    board[0][1] = "X";
+
+    expect(whoStarted(board)).toBeNull();
+  });
+
+  it("Should handle an empty board", () => {
+    const board = createEmptyBoard();
+
+    expect(whoStarted(board)).toBe("");
   });
 });

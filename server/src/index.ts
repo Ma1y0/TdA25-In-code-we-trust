@@ -3,7 +3,7 @@ import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
 import { api } from "@/api";
 
-const app = new Hono();
+const app = new Hono({ strict: false });
 
 app.use(logger());
 

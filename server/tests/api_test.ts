@@ -3,7 +3,6 @@ import { db, resetDB } from "@/db";
 import { Board, games } from "@/db/schema";
 import { beforeAll, beforeEach, describe, expect, it } from "bun:test";
 
-
 beforeAll(() => {
   // Sets up the environment for testing
   process.env.NODE_ENV = "test";
@@ -171,6 +170,7 @@ describe("API", () => {
       const updateData = {
         difficulty: "hard",
         name: "Game #2",
+        gameState: "unknown",
       };
       const req = new Request(`${baseURL}/games/${id}`, {
         method: "PUT",
@@ -212,3 +212,4 @@ describe("API", () => {
     });
   });
 });
+

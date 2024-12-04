@@ -16,7 +16,7 @@ export const games = sqliteTable(
   {
     uuid: text("uuid").primaryKey(),
     name: text("name").notNull(),
-    turn: text("turn", { enum: players }).default("X").notNull(), // Determines which players turn it is
+    nextTurn: text("next_turn", { enum: players }).default("X").notNull(), // Determines which players turn it is
     difficulty: text("difficulty", { enum: difficulty }).notNull(),
     gameState: text("game_state", { enum: gameState }).notNull(),
     board: text("board", {

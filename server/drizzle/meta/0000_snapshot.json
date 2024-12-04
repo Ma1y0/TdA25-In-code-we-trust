@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "50df2213-0747-4628-a13f-5bf5de79c4fd",
+  "id": "069d1bce-16e0-4165-bb38-1c570357dfe6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "games": {
@@ -21,8 +21,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "turn": {
-          "name": "turn",
+        "next_turn": {
+          "name": "next_turn",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

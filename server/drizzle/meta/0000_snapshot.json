@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "95525902-518b-4259-ae1b-eb7b9eca19d6",
+  "id": "50df2213-0747-4628-a13f-5bf5de79c4fd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "games": {
@@ -21,13 +21,13 @@
           "notNull": true,
           "autoincrement": false
         },
-        "turns": {
-          "name": "turns",
-          "type": "integer",
+        "turn": {
+          "name": "turn",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": 0
+          "default": "'X'"
         },
         "difficulty": {
           "name": "difficulty",

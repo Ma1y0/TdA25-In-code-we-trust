@@ -1,4 +1,4 @@
-import { type Cell, type Board } from "@/db/schema";
+import { type Cell, type Board, type Row } from "@/db/schema";
 import { detectEndgame } from "@/endgameHelpers";
 import { beforeAll, describe, expect, it } from "bun:test";
 import { detectGameState, whoStarted } from "@/boardHelpers";
@@ -33,7 +33,9 @@ export function createMockGame(turns: number): Board {
   }
 
   // In case an endgame board is generated
-  return detectEndgame(board) ? createMockGame(turns) : board;
+  return detectEndgame(board, "X") || detectEndgame(board, "O")
+    ? createMockGame(turns)
+    : board;
 }
 
 describe("detectGameState", () => {
@@ -64,35 +66,111 @@ describe("detectGameState", () => {
   });
 });
 
-describe("Who started", () => {
-  it("Should detect X started", () => {
+describe("whoStarted()", () => {
+  it("Should recognize that X started when it's X turn", () => {
     const board = createEmptyBoard();
-
     board[0][0] = "X";
+    board[1][1] = "X";
+    board[2][0] = "O";
+    board[2][2] = "O";
 
-    expect(whoStarted(board)).toBe("X");
+    expect(whoStarted(board, "X")).toBe("X");
+  });
+});
+
+describe("detectEndgame())", () => {
+  // Helper to create an empty board
+  function createEmptyBoard(): Board {
+    return Array(15)
+      .fill(null)
+      .map(() => Array(15).fill("") as Row) as Board;
+  }
+
+  it("Should detect horizontal winning move", () => {
+    const board = createEmptyBoard();
+    // Set up XXXX_ pattern
+    board[7][5] = "X";
+    board[7][6] = "X";
+    board[7][7] = "X";
+    board[7][8] = "X";
+
+    expect(detectEndgame(board, "X")).toBe(true);
   });
 
-  it("Should detect O started", () => {
+  it("Should detect vertical winning move", () => {
     const board = createEmptyBoard();
+    // Set up vertical XXXX_ pattern
+    board[4][7] = "X";
+    board[5][7] = "X";
+    board[6][7] = "X";
+    board[7][7] = "X";
 
-    board[0][0] = "O";
-
-    expect(whoStarted(board)).toBe("O");
+    expect(detectEndgame(board, "X")).toBe(true);
   });
 
-  it("Should detect invalid board", () => {
+  it("Should detect diagonal winning move", () => {
     const board = createEmptyBoard();
+    // Set up diagonal XXXX_ pattern
+    board[3][3] = "X";
+    board[4][4] = "X";
+    board[5][5] = "X";
+    board[6][6] = "X";
 
-    board[0][0] = "X";
-    board[0][1] = "X";
-
-    expect(whoStarted(board)).toBeNull();
+    expect(detectEndgame(board, "X")).toBe(true);
   });
 
-  it("Should handle an empty board", () => {
+  it("Should not detect win when sequence is blocked by opponent", () => {
     const board = createEmptyBoard();
+    // Set up XXXXO pattern (blocked by opponent)
+    board[7][5] = "X";
+    board[7][6] = "X";
+    board[7][7] = "X";
+    board[7][8] = "X";
+    board[7][9] = "O";
 
-    expect(whoStarted(board)).toBe("");
+    expect(detectEndgame(board, "X")).toBe(false);
+  });
+
+  it("Should not detect win when sequence is blocked by wall", () => {
+    const board = createEmptyBoard();
+    // Set up XXXX pattern at edge of board
+    board[14][11] = "X";
+    board[14][12] = "X";
+    board[14][13] = "X";
+    board[14][14] = "X";
+
+    expect(detectEndgame(board, "X")).toBe(false);
+  });
+
+  it("Should detect win for O player", () => {
+    const board = createEmptyBoard();
+    // Set up OOOO_ pattern
+    board[7][5] = "O";
+    board[7][6] = "O";
+    board[7][7] = "O";
+    board[7][8] = "O";
+
+    expect(detectEndgame(board, "O")).toBe(true);
+  });
+
+  it("Should not detect win when there are only 3 symbols in a row", () => {
+    const board = createEmptyBoard();
+    // Set up XXX_ pattern
+    board[7][5] = "X";
+    board[7][6] = "X";
+    board[7][7] = "X";
+
+    expect(detectEndgame(board, "X")).toBe(false);
+  });
+
+  it("Should not detect win when there are gaps between symbols", () => {
+    const board = createEmptyBoard();
+    // Set up XX_XX pattern
+    board[7][5] = "X";
+    board[7][6] = "X";
+    board[7][8] = "X";
+    board[7][9] = "X";
+
+    expect(detectEndgame(board, "X")).toBe(false);
   });
 });

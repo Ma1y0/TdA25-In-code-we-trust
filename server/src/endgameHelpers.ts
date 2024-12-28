@@ -1,95 +1,109 @@
-import { type Board, Cell } from "@/db/schema";
+import type { Cell, Board } from "@/db/schema";
 
-const winLen = 5;
-const players = ["X", "O"] as const;
+function isInBounds(row: number, col: number): boolean {
+  return row >= 0 && row < 15 && col >= 0 && col < 15;
+}
 
-export function detectEndgame(board: Board): boolean {
-  for (const player of players) {
-    // The lines
-    for (const row of board) {
-      if (canCompleteLine(row, player)) return true;
-    }
+function getCell(board: Board, row: number, col: number): Cell {
+  if (!isInBounds(row, col)) return "";
+  return board[row][col];
+}
 
-    // The columns
-    for (let col = 0; col < board[0].length; col++) {
-      if (canCompleteLine(getColumn(board, col), player)) return true;
-    }
+// Find continuous sequence of player's symbols
+function findContinuousSequence(
+  board: Board,
+  startRow: number,
+  startCol: number,
+  rowDir: number,
+  colDir: number,
+  nextTurn: "X" | "O",
+): { count: number; emptyPos: [number, number] | null } {
+  let count = 0;
+  let emptyPos: [number, number] | null = null;
+  let foundEmpty = false;
 
-    // The diagonals
-    for (let col = 0; col < board[0].length; col++) {
-      if (canCompleteLine(getColumn(board, col), player)) return true;
-    }
+  // Check up to 5 positions
+  for (let i = 0; i < 5; i++) {
+    const row = startRow + i * rowDir;
+    const col = startCol + i * colDir;
 
-    // Check diagonals (top-left to bottom-right)
-    // Start from left column
-    for (let col = 0; col < board[0].length; col++) {
-      const diagonal = getDiagonalTLBR(board, 0, col);
-      if (diagonal.length >= 5 && canCompleteLine(diagonal, player))
-        return true;
-    }
-    // Start from top row (except first column)
-    for (let row = 1; row < board.length; row++) {
-      const diagonal = getDiagonalTLBR(board, row, 0);
-      if (diagonal.length >= 5 && canCompleteLine(diagonal, player))
-        return true;
-    }
+    if (!isInBounds(row, col)) break;
 
-    // Check diagonals (top-right to bottom-left)
-    // Start from right column
-    for (let col = board[0].length - 1; col >= 0; col--) {
-      const diagonal = getDiagonalTRBL(board, 0, col);
-      if (diagonal.length >= 5 && canCompleteLine(diagonal, player))
-        return true;
-    }
-    // Start from top row (except last column)
-    for (let row = 1; row < board.length; row++) {
-      const diagonal = getDiagonalTRBL(board, row, board[0].length - 1);
-      if (diagonal.length >= 5 && canCompleteLine(diagonal, player))
-        return true;
+    const cell = board[row][col];
+
+    if (cell === nextTurn) {
+      if (foundEmpty) return { count: 0, emptyPos: null }; // Not continuous
+      count++;
+    } else if (cell === "") {
+      if (foundEmpty) return { count: 0, emptyPos: null }; // Multiple empty spaces
+      foundEmpty = true;
+      emptyPos = [row, col];
+    } else {
+      break; // Opponent's symbol
     }
   }
 
-  return false;
+  return { count, emptyPos };
 }
 
-// Get diagonal starting from top-left to bottom-right
-function getDiagonalTLBR(board: Board, row: number, col: number): Cell[] {
-  const diagonal: Cell[] = [];
+function isWinnableSequence(
+  board: Board,
+  startRow: number,
+  startCol: number,
+  rowDir: number,
+  colDir: number,
+  nextTurn: "X" | "O",
+): boolean {
+  const opponent = nextTurn === "X" ? "O" : "X";
 
-  while (row < board.length && col < board[0].length) {
-    diagonal.push(board[row][col]);
-    row++;
-    col++;
-  }
+  // Find continuous sequence
+  const { count, emptyPos } = findContinuousSequence(
+    board,
+    startRow,
+    startCol,
+    rowDir,
+    colDir,
+    nextTurn,
+  );
 
-  return diagonal;
+  // Must have exactly 4 symbols and one empty position
+  if (count !== 4 || !emptyPos) return false;
+
+  // Check if sequence is blocked
+  const [emptyRow, emptyCol] = emptyPos;
+  const beforeRow = startRow - rowDir;
+  const beforeCol = startCol - colDir;
+  const afterRow = emptyRow + rowDir;
+  const afterCol = emptyCol + colDir;
+
+  // Check positions before and after the sequence
+  const beforeCell = getCell(board, beforeRow, beforeCol);
+  const afterCell = getCell(board, afterRow, afterCol);
+
+  // If both ends are blocked (by opponent or wall), sequence is not winnable
+  const isBlockedBefore =
+    beforeCell === opponent || !isInBounds(beforeRow, beforeCol);
+  const isBlockedAfter =
+    afterCell === opponent || !isInBounds(afterRow, afterCol);
+
+  return !(isBlockedBefore && isBlockedAfter);
 }
 
-// Get diagonal starting from top-right to bottom-left
-function getDiagonalTRBL(board: Board, row: number, col: number): Cell[] {
-  const diagonal: Cell[] = [];
+export function detectEndgame(board: Board, nextTurn: "X" | "O"): boolean {
+  // Check all possible starting positions
+  for (let row = 0; row < 15; row++) {
+    for (let col = 0; col < 15; col++) {
+      // Check horizontal sequences
+      if (isWinnableSequence(board, row, col, 0, 1, nextTurn)) return true;
 
-  while (row < board.length && col >= 0) {
-    diagonal.push(board[row][col]);
-    row++;
-    col--;
-  }
+      // Check vertical sequences
+      if (isWinnableSequence(board, row, col, 1, 0, nextTurn)) return true;
 
-  return diagonal;
-}
+      // Check diagonal sequences (top-left to bottom-right)
+      if (isWinnableSequence(board, row, col, 1, 1, nextTurn)) return true;
 
-function getColumn(board: Board, i: number): Cell[] {
-  return board.map((row) => row[i]);
-}
-
-function canCompleteLine(row: Cell[], player: "X" | "O"): boolean {
-  for (let i = 0; i <= row.length - winLen; i++) {
-    const window = row.slice(i, i + winLen);
-    const playerCells = window.filter((x) => x === player).length;
-    const emptyCells = window.filter((x) => x === "").length;
-
-    if (playerCells === winLen - 1 && emptyCells === 1) {
-      return true;
+      // Check diagonal sequences (top-right to bottom-left)
+      if (isWinnableSequence(board, row, col, 1, -1, nextTurn)) return true;
     }
   }
 

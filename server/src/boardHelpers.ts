@@ -8,25 +8,23 @@ export function calculateGameTurns(board: Board): number {
 // Finds out which player started the game.
 // "" (empty string) = The game haven't started yet
 // null = The board is invalid
-export function whoStarted(board: Board): "X" | "O" | "" | null {
+export function whoStarted(board: Board, nextTurn: "X" | "O") {
   const xCount = board.flat().filter((x) => x === "X").length;
   const oCount = board.flat().filter((x) => x === "O").length;
 
-  // An empty board
-  if (xCount === 0 && oCount === 0) return "";
-
-  if (xCount === oCount - 1) {
+  if (nextTurn === "X" && xCount < oCount) {
     return "O";
-  } else if (xCount - 1 === oCount) {
-    return "X";
   }
 
-  // An invalid board
-  return null;
+  if (nextTurn === "O" && xCount > oCount) {
+    return "O";
+  }
+
+  return "X";
 }
 
 export function detectGameState(board: Board): GameState {
-  if (detectEndgame(board)) return "endgame";
+  if (detectEndgame(board, "X")) return "endgame";
   const turns = calculateGameTurns(board);
 
   if (turns <= 5) {
